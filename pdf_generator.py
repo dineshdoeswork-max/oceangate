@@ -1,6 +1,3 @@
-# PDF report ka kaam nahi hai sirf document banana — yeh ek field-ready action brief banana hai.
-# "Jab samajh aati hai, tab decision fast hota hai, aur fast decision hi rescue ko possible banata hai."
-# Chalo, report ko clean, sharp, and operationally useful banate hain.
 import io
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -13,11 +10,22 @@ def generate_icg_report(spill_data: dict) -> io.BytesIO:
     elements = []
     styles = getSampleStyleSheet()
 
+    # Dynamically assign the regional authority based on the EEZ
+    eez_name = spill_data['eez'].upper()
+    if "INDIA" in eez_name:
+        authority = "INDIAN COAST GUARD"
+    elif "OMAN" in eez_name:
+        authority = "OMAN MARITIME SECURITY"
+    elif "LIBYA" in eez_name:
+        authority = "MEDITERRANEAN TASK FORCE"
+    else:
+        authority = f"{eez_name} MARITIME AUTHORITY"
+
     title_style = ParagraphStyle(
         'Title', parent=styles['Heading1'], fontSize=16, leading=20,
         textColor=colors.HexColor("#0f172a"), spaceAfter=8
     )
-    elements.append(Paragraph("INDIAN COAST GUARD: SAR INCIDENT DOSSIER", title_style))
+    elements.append(Paragraph(f"{authority}: SAR INCIDENT DOSSIER", title_style))
     elements.append(Paragraph(f"SURVEILLANCE ID: {spill_data['name']}", styles['Normal']))
     elements.append(Spacer(1, 14))
 
@@ -58,9 +66,8 @@ def generate_icg_report(spill_data: dict) -> io.BytesIO:
 
     elements.append(Paragraph("OPERATIONAL DIRECTIVE", styles['Heading3']))
     mandate = (
-        "Under the National Oil Spill Disaster Contingency Plan (NOS-DCP), this discharge footprint "
-        "has been correlated with the aforementioned vessel using Sentinel-1 SAR imagery and AIS vector extrapolation. "
-        "Urgent aerial verification and interception by the nearest Coast Guard District Headquarters is requested."
+        f"This discharge footprint has been correlated with the aforementioned vessel using Sentinel-1 SAR imagery. "
+        f"Urgent aerial verification and interception by {authority} is requested."
     )
     elements.append(Paragraph(mandate, styles['Normal']))
 

@@ -94,6 +94,7 @@ function renderCard(spill) {
 }
 
 function selectSpill(id) {
+  document.getElementById('sidebar').classList.remove('open');
   forecastLayerGroup.clearLayers();
   if (activeSpillId) {
     const prevCard = document.getElementById(`card-${activeSpillId}`);
