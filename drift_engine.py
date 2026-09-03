@@ -3,18 +3,13 @@ from shapely.geometry import Polygon, mapping
 from shapely.affinity import translate
 
 def get_regional_physics(lon: float, lat: float):
-    """Assigns rough regional current and wind vectors based on global coordinates."""
     if 50 < lon < 80 and 0 < lat < 25:
-        # Arabian Sea / West India (Monsoon winds, strong current)
         return {"c_speed": 0.35, "c_angle": 160, "w_speed": 9.2, "w_angle": 135}
     elif 80 <= lon < 100 and 5 < lat < 25:
-        # Bay of Bengal
         return {"c_speed": 0.28, "c_angle": 210, "w_speed": 7.5, "w_angle": 180}
     elif -10 < lon < 40 and 30 < lat < 45:
-        # Mediterranean Sea (Weaker, complex currents)
         return {"c_speed": 0.15, "c_angle": 90, "w_speed": 5.0, "w_angle": 110}
     else:
-        # Global Default Average
         return {"c_speed": 0.20, "c_angle": 180, "w_speed": 6.0, "w_angle": 180}
 
 def simulate_drift(polygon_coords: list, hours: list = [12, 24, 48]):

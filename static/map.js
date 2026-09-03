@@ -1,8 +1,5 @@
-﻿// map ko live intelligence ka dashboard banaana, aur har spill ko ek clear action plan mein convert karna
-// "Aaj ka kaam chhota lag sakta hai, par kal ka impact bada hota hai."
-// Kuch bhi likhta hu 
-const map = L.map("map", {
-  center: [22, 65],
+﻿const map = L.map("map", {
+  center: [20, 75],
   zoom: 5,
   zoomControl: true,
 });
@@ -82,7 +79,7 @@ function renderCard(spill) {
   card.className = "spill-card";
   card.id = `card-${spill.id}`;
   card.innerHTML = `
-    <div class="spill-id">INC-${spill.id.toString().padStart(3,"0")} &bull; ${spill.satellite}</div>
+    <div class="spill-id">${spill.name.split(' ')[0]} &bull; ${spill.satellite}</div>
     <div class="spill-name">${spill.location}</div>
     <div class="spill-meta">
       <span class="spill-tag area"><i class="fa-solid fa-droplet"></i> ${spill.area_km2} km²</span>
@@ -94,8 +91,9 @@ function renderCard(spill) {
 }
 
 function selectSpill(id) {
-  document.getElementById('sidebar').classList.remove('open');
   forecastLayerGroup.clearLayers();
+  document.getElementById('sidebar').classList.remove('open');
+  
   if (activeSpillId) {
     const prevCard = document.getElementById(`card-${activeSpillId}`);
     if (prevCard) prevCard.classList.remove("active");

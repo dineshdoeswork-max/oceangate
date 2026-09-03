@@ -1,21 +1,30 @@
-
-
-# So, connection stable h schema clear rakh, aur har spill ko ek traceable record banaane ka kaam kara
-from sqlalchemy import create_engine, Column, Integer, String, Float
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from geoalchemy2 import Geometry
 
-# Updated to use the Supabase IPv4 Session Pooler for the ap-southeast-2 region
 DATABASE_URL = "postgresql://postgres.zgobwbywkzkjurcywqdu:Abkibaar150par@aws-0-ap-southeast-2.pooler.supabase.com:6543/postgres"
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-class SpillIncident(Base):
-    __tablename__ = "spills"
-
+class Vessel(Base):
+    __tablename__ = "vessels"
     id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    mmsi = Column(String)
+    imo = Column(String)
+    flag = Column(String)
+    vessel_type = Column(String)
+    length_m = Column(Integer)
+    
+    incidents = relationship("Incident", back_populates="vessel")
+
+class Incident(Base):
+    __tablename__ = "incidents"
+    id = Column(Integer, primary_key=True, index=True)
+    vessel_id = Column(Integer, ForeignKey("vessels.id"))
+    
     name = Column(String, nullable=False)
     date = Column(String, nullable=False)
     date_display = Column(String, nullable=False)
@@ -28,22 +37,22 @@ class SpillIncident(Base):
     orbit_pass = Column(String, nullable=False)
     confidence = Column(Integer, nullable=False)
     
-    # Vessel Details
-    vessel_name = Column(String)
-    vessel_mmsi = Column(String)
-    vessel_imo = Column(String)
-    vessel_flag = Column(String)
-    vessel_type = Column(String)
-    vessel_length_m = Column(Integer)
+    vessel = relationship("Vessel", back_populates="incidents")
+    spatial_data = relationship("SpatialData", back_populates="incident", uselist=False, cascade="all, delete-orphan")
+
+class SpatialData(Base):
+    __tablename__ = "spatial_data"
+    id = Column(Integer, primary_key=True, index=True)
+    incident_id = Column(Integer, ForeignKey("incidents.id"))
     
-    # PostGIS Spatial Geometries (WGS84 EPSG:4326)
     geometry = Column(Geometry("POLYGON", srid=4326))
     ship_track = Column(Geometry("LINESTRING", srid=4326))
-    
-    # Coordinates for mapping
     center_lon = Column(Float)
     center_lat = Column(Float)
     ship_pos_lon = Column(Float)
     ship_pos_lat = Column(Float)
 
+    incident = relationship("Incident", back_populates="spatial_data")
+
+Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)

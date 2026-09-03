@@ -1,154 +1,74 @@
-from database import SessionLocal, SpillIncident
-from shapely.geometry import shape
+import random
+from datetime import datetime, timedelta
+from shapely.geometry import Point, LineString
+from database import SessionLocal, Vessel, Incident, SpatialData
 
-RAW_SPILLS = [
-    {
-        "id": 1,
-        "name": "Mediterranean Incident MC-2024-001",
-        "date": "2024-03-15T02:47:00Z",
-        "date_display": "15 March 2024   02:47 UTC",
-        "location": "Mediterranean Sea, Libya Coast",
-        "area_km2": 28.4,
-        "length_km": 41.2,
-        "eez": "International Waters (Libya EEZ border)",
-        "status": "Confirmed",
-        "satellite": "Sentinel-1A",
-        "orbit_pass": "Ascending Pass #033541",
-        "confidence": 94,
-        "vessel": {
-            "name": "MV Adriatic Pioneer",
-            "mmsi": "247456123",
-            "flag": "Panama",
-            "type": "Chemical Tanker",
-            "length_m": 186,
-            "imo": "9512847"
-        },
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-                [12.85, 33.18], [12.95, 33.21], [13.10, 33.25],
-                [13.28, 33.29], [13.45, 33.31], [13.60, 33.27],
-                [13.58, 33.20], [13.42, 33.16], [13.25, 33.13],
-                [13.08, 33.12], [12.92, 33.13], [12.85, 33.18]
-            ]]
-        },
-        "ship_track": {
-            "type": "LineString",
-            "coordinates": [
-                [12.10, 33.50], [12.40, 33.40],
-                [12.75, 33.30], [13.20, 33.28],
-                [13.65, 33.22], [14.05, 33.10]
-            ]
-        },
-        "ship_position": [14.05, 33.10],
-        "center": [13.22, 33.22]
-    },
-    {
-        "id": 2,
-        "name": "Arabian Sea Incident AS-2024-047",
-        "date": "2024-07-22T17:12:00Z",
-        "date_display": "22 July 2024   17:12 UTC",
-        "location": "Arabian Sea, Oman Coastal Zone",
-        "area_km2": 15.7,
-        "length_km": 23.8,
-        "eez": "Oman Exclusive Economic Zone",
-        "status": "Under Investigation",
-        "satellite": "Sentinel-1B",
-        "orbit_pass": "Descending Pass #041892",
-        "confidence": 87,
-        "vessel": {
-            "name": "MT Gulf Horizon",
-            "mmsi": "403789456",
-            "flag": "Liberia",
-            "type": "Crude Oil Tanker",
-            "length_m": 243,
-            "imo": "9678341"
-        },
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-                [58.85, 22.08], [58.95, 22.13], [59.08, 22.16],
-                [59.22, 22.17], [59.38, 22.14], [59.50, 22.09],
-                [59.46, 22.02], [59.30, 21.99], [59.14, 21.98],
-                [58.98, 22.01], [58.85, 22.08]
-            ]]
-        },
-        "ship_track": {
-            "type": "LineString",
-            "coordinates": [
-                [59.10, 20.75], [59.11, 21.05],
-                [59.12, 21.35], [59.14, 21.65],
-                [59.16, 21.95], [59.18, 22.30]
-            ]
-        },
-        "ship_position": [59.18, 22.30],
-        "center": [59.17, 22.08]
-    },
-    {
-        "id": 3,
-        "name": "Bay of Bengal Incident BB-2024-089",
-        "date": "2024-08-14T09:30:00Z",
-        "date_display": "14 August 2024   09:30 UTC",
-        "location": "Bay of Bengal, East Coast Offing",
-        "area_km2": 32.1,
-        "length_km": 47.8,
-        "eez": "Indian Exclusive Economic Zone",
-        "status": "Confirmed",
-        "satellite": "Sentinel-1A",
-        "orbit_pass": "Descending Pass #045102",
-        "confidence": 91,
-        "vessel": {
-            "name": "MT Ocean Venture",
-            "mmsi": "419001234",
-            "flag": "India",
-            "type": "Crude Oil Tanker",
-            "length_m": 274,
-            "imo": "9812401"
-        },
-        "geometry": {
-            "type": "Polygon",
-            "coordinates": [[
-                [85.10, 18.20], [85.25, 18.24], [85.42, 18.26],
-                [85.60, 18.23], [85.58, 18.17], [85.39, 18.14],
-                [85.20, 18.12], [85.10, 18.20]
-            ]]
-        },
-        "ship_track": {
-            "type": "LineString",
-            "coordinates": [
-                [84.70, 18.35], [85.00, 18.28], [85.35, 18.21], [85.70, 18.10]
-            ]
-        },
-        "ship_position": [85.70, 18.10],
-        "center": [85.35, 18.20]
-    }
+LOCATIONS = [
+    ("Mumbai High Offshore", "Indian EEZ", 19.35, 71.35, "MT Swarna Godavari", "Crude Tanker"),
+    ("JNPT Approach Channel", "Indian Territorial Waters", 18.85, 72.50, "MV MSC Mumbai", "Cargo"),
+    ("Ratnagiri Coastal Offing", "Indian EEZ", 16.98, 72.95, "MT Ratna", "Chemical Tanker"),
+    ("Sindhudurg Marine Zone", "Indian EEZ", 16.15, 73.18, "MV Konkan Pearl", "Bulk Carrier"),
+    ("Tarapur Offshore", "Indian EEZ", 19.82, 72.35, "MT Desh Bhakta", "Crude Tanker"),
+    ("Alibaug Coastal Limits", "Indian Territorial Waters", 18.60, 72.75, "MV Alibaug Express", "Cargo"),
+    ("Vasai-Virar Offing", "Indian EEZ", 19.38, 72.58, "MT Surya", "Oil Products Tanker"),
+    ("Murud-Janjira Approach", "Indian EEZ", 18.32, 72.80, "MV Sea Fortune", "Cargo"),
+    ("Gulf of Khambhat", "Indian EEZ", 20.55, 72.05, "MT Gujarat Glory", "Crude Tanker"),
+    ("Goa Maritime Boundary", "Indian EEZ", 15.52, 73.45, "MV Mandovi", "Bulk Carrier"),
+    ("Mangalore Port Limits", "Indian Territorial Waters", 12.85, 74.65, "MT Nethravathi", "Chemical Tanker"),
+    ("Kochi Offshore Basin", "Indian EEZ", 9.95, 75.92, "MV Kerala Star", "Container"),
+    ("Chennai Coastal Zone", "Indian EEZ", 13.15, 80.45, "MT Coromandel", "Crude Tanker"),
+    ("Visakhapatnam Offing", "Indian EEZ", 17.65, 83.48, "MV Vizag Pride", "Cargo"),
+    ("Gulf of Kutch", "Indian EEZ", 22.55, 69.05, "MT Kutch Energy", "Oil Products Tanker"),
+    ("Gulf of Mexico - Louisiana", "US EEZ", 28.55, -90.05, "MT Pelican State", "Crude Tanker"),
+    ("Gulf of Mexico - Texas", "US EEZ", 27.85, -93.55, "MV Lone Star", "Bulk Carrier"),
+    ("Galveston Bay Approach", "US Territorial Waters", 29.15, -94.65, "MT Houston Pride", "Chemical Tanker"),
+    ("Santa Barbara Channel", "US EEZ", 34.25, -120.15, "MV Pacific Trader", "Cargo"),
+    ("Prince William Sound", "US Territorial Waters", 60.65, -147.05, "MT Valdez Spirit", "Crude Tanker"),
+    ("Strait of Hormuz", "Oman EEZ", 26.55, 56.25, "MT Gulf Horizon", "Crude Tanker"),
+    ("Malacca Strait", "Malaysia EEZ", 2.55, 101.55, "MV Asian Pearl", "Container"),
+    ("English Channel", "UK EEZ", 50.15, -1.05, "MT Channel Navigator", "Chemical Tanker"),
+    ("Niger Delta Offshore", "Nigeria EEZ", 4.15, 5.55, "MT Delta Star", "Crude Tanker"),
+    ("Mediterranean Sea", "Libya EEZ", 33.25, 13.25, "MV Adriatic Pioneer", "Cargo")
 ]
 
 db = SessionLocal()
-print("Connected to Supabase. Seeding records...")
-for s in RAW_SPILLS:
-    existing = db.query(SpillIncident).filter(SpillIncident.id == s["id"]).first()
-    if existing:
-        db.delete(existing)
-        db.commit()
 
-    poly_geom = f"SRID=4326;{shape(s['geometry']).wkt}"
-    track_geom = f"SRID=4326;{shape(s['ship_track']).wkt}"
+for idx, (loc_name, eez, lat, lon, v_name, v_type) in enumerate(LOCATIONS, start=1):
+    sim_date = datetime.utcnow() - timedelta(days=random.randint(1, 60))
     
-    incident = SpillIncident(
-        id=s["id"], name=s["name"], date=s["date"], date_display=s["date_display"],
-        location=s["location"], area_km2=s["area_km2"], length_km=s["length_km"],
-        eez=s["eez"], status=s["status"], satellite=s["satellite"],
-        orbit_pass=s["orbit_pass"], confidence=s["confidence"],
-        vessel_name=s["vessel"]["name"], vessel_mmsi=s["vessel"]["mmsi"],
-        vessel_imo=s["vessel"]["imo"], vessel_flag=s["vessel"]["flag"],
-        vessel_type=s["vessel"]["type"], vessel_length_m=s["vessel"]["length_m"],
-        geometry=poly_geom, ship_track=track_geom,
-        center_lon=s["center"][0], center_lat=s["center"][1],
-        ship_pos_lon=s["ship_position"][0], ship_pos_lat=s["ship_position"][1]
+    center = Point(lon, lat)
+    poly = center.buffer(random.uniform(0.04, 0.08)) 
+    track = LineString([(lon - 0.2, lat - 0.2), (lon, lat), (lon + 0.1, lat + 0.1)])
+    
+    poly_wkt = f"SRID=4326;{poly.wkt}"
+    track_wkt = f"SRID=4326;{track.wkt}"
+
+    vessel = Vessel(
+        name=v_name, mmsi=str(random.randint(200000000, 499999999)),
+        imo=str(random.randint(9000000, 9999999)), flag=random.choice(["India", "Panama", "Liberia", "Marshall Islands"]),
+        vessel_type=v_type, length_m=random.randint(120, 300)
+    )
+    db.add(vessel)
+    db.flush() 
+
+    incident = Incident(
+        vessel_id=vessel.id, name=f"{loc_name.split()[0].upper()} INC-{idx:03d}",
+        date=sim_date.strftime("%Y-%m-%dT%H:%M:%SZ"), date_display=sim_date.strftime("%d %B %Y   %H:%M UTC"),
+        location=loc_name, area_km2=round(random.uniform(10.5, 45.0), 1),
+        length_km=round(random.uniform(15.0, 60.0), 1), eez=eez,
+        status=random.choice(["Confirmed", "Under Investigation"]),
+        satellite=random.choice(["Sentinel-1A", "Sentinel-1B"]),
+        orbit_pass=f"Pass #{random.randint(10000, 99999)}", confidence=random.randint(82, 98)
     )
     db.add(incident)
+    db.flush()
+
+    spatial = SpatialData(
+        incident_id=incident.id, geometry=poly_wkt, ship_track=track_wkt,
+        center_lon=lon, center_lat=lat, ship_pos_lon=lon + 0.1, ship_pos_lat=lat + 0.1
+    )
+    db.add(spatial)
 
 db.commit()
 db.close()
-print("Success: Supabase PostGIS table populated.")
+print("Success: 3-Table Normalized Schema Populated with 25 Incidents.")
