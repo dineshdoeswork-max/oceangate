@@ -1,4 +1,4 @@
-﻿const map = L.map("map", {
+const map = L.map("map", {
   center: [20, 75],
   zoom: 5,
   zoomControl: true,
@@ -185,25 +185,45 @@ document.getElementById("btn-report").addEventListener("click", () => {
 });
 
 async function loadStats() {
-  const res = await fetch("/api/stats");
-  const data = await res.json();
-  document.getElementById("stat-total").textContent = data.total_spills;
-  document.getElementById("stat-area").textContent = data.total_area_km2;
-  document.getElementById("stat-conf").textContent = data.avg_confidence + "%";
-  document.getElementById("stat-length").textContent = data.total_length_km;
+  try {
+    const res = await fetch("/api/stats");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    document.getElementById("stat-total").textContent = data.total_spills ?? 0;
+    document.getElementById("stat-area").textContent = data.total_area_km2 ?? 0;
+    document.getElementById("stat-conf").textContent = (data.avg_confidence ?? 0) + "%";
+    document.getElementById("stat-length").textContent = data.total_length_km ?? 0;
+  } catch (err) {
+    console.error("Failed to load stats:", err);
+  }
 }
 
 async function boot() {
-  const res = await fetch("/api/spills");
-  const data = await res.json();
-  window._spills = data.spills;
-  data.spills.forEach((spill) => {
-    renderCard(spill);
-    drawSpill(spill);
-  });
-  await loadStats();
-  if (data.spills.length > 0) {
-    setTimeout(() => selectSpill(data.spills[0].id), 600);
+  try {
+    const res = await fetch("/api/spills");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    window._spills = data.spills || [];
+    
+    const spillList = document.getElementById("spill-list");
+    if (window._spills.length === 0 && spillList) {
+      spillList.innerHTML = `<div style="padding: 1rem; color: #a1a1aa; font-size: 0.85rem;">No active detections found.</div>`;
+    }
+
+    window._spills.forEach((spill) => {
+      renderCard(spill);
+      drawSpill(spill);
+    });
+    await loadStats();
+    if (window._spills.length > 0) {
+      setTimeout(() => selectSpill(window._spills[0].id), 600);
+    }
+  } catch (err) {
+    console.error("Failed to boot map:", err);
+    const spillList = document.getElementById("spill-list");
+    if (spillList) {
+      spillList.innerHTML = `<div style="padding: 1rem; color: #f87171; font-size: 0.85rem;">Error loading feeds. Please check server connection.</div>`;
+    }
   }
 }
 

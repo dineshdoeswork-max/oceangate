@@ -1,7 +1,12 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from shapely.geometry import Point, LineString
-from database import SessionLocal, Vessel, Incident, SpatialData
+from database import SessionLocal, Vessel, Incident, SpatialData, Base, engine
+
+# Reset tables cleanly before populating seed data
+print("Resetting database tables...")
+Base.metadata.drop_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 LOCATIONS = [
     ("Mumbai High Offshore", "Indian EEZ", 19.35, 71.35, "MT Swarna Godavari", "Crude Tanker"),
@@ -34,7 +39,7 @@ LOCATIONS = [
 db = SessionLocal()
 
 for idx, (loc_name, eez, lat, lon, v_name, v_type) in enumerate(LOCATIONS, start=1):
-    sim_date = datetime.utcnow() - timedelta(days=random.randint(1, 60))
+    sim_date = datetime.now(timezone.utc) - timedelta(days=random.randint(1, 60))
     
     center = Point(lon, lat)
     poly = center.buffer(random.uniform(0.04, 0.08)) 
