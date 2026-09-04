@@ -95,8 +95,10 @@
       </div>
     </div>
 
+    <div id="dark-alert-wrap"></div>
+
     <div class="vessel-box">
-      <div class="vessel-title"><i class="fa-solid fa-ship"></i> Identified Vessel</div>
+      <div class="vessel-title" id="v-title"><i class="fa-solid fa-ship"></i> Primary Identified Vessel</div>
       <div class="vessel-grid">
         <div><span class="vl">Name</span><span class="vv" id="v-name"></span></div>
         <div><span class="vl">MMSI</span><span class="vv" id="v-mmsi"></span></div>
@@ -106,6 +108,8 @@
         <div><span class="vl">Length</span><span class="vv" id="v-len"></span></div>
       </div>
       
+      <div id="sec-vessel-wrap"></div>
+
       <div style="margin-top: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 12px;">
         <button id="btn-drift" class="status-badge investigating" style="cursor:pointer; border:none; padding: 6px 12px;">
           <i class="fa-solid fa-wind"></i> 48h Drift Forecast
@@ -118,10 +122,12 @@
   </div>
 
   <div class="legend">
-    <div class="legend-item"><span class="legend-color oil"></span> Oil Slick</div>
-    <div class="legend-item"><span class="legend-color ship"></span> Ship AIS Track</div>
+    <div class="legend-item"><span class="legend-color oil"></span> Oil Slick (Wake / Pool)</div>
+    <div class="legend-item"><span class="legend-color ship"></span> AIS Vessel Track</div>
+    <div class="legend-item" style="color: #c084fc;"><span style="border-top: 2px dashed #c084fc; width: 18px; height: 2px;"></span> Secondary Ship Track</div>
     <div class="legend-item" style="color: #fbbf24;"><span style="border-top: 2px dashed #fbbf24; width: 18px; height: 2px;"></span> Projected Drift</div>
-    <div class="legend-item"><span class="legend-icon"><i class="fa-solid fa-ship"></i></span> Vessel</div>
+    <div class="legend-item"><span class="legend-icon"><i class="fa-solid fa-ship"></i></span> AIS Vessel</div>
+    <div class="legend-item" style="color: #ef4444;"><span class="legend-icon" style="color: #ef4444;"><i class="fa-solid fa-ghost"></i></span> Dark Vessel</div>
   </div>
 </main>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>

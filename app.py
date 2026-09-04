@@ -1,7 +1,7 @@
-﻿import os
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, FileResponse, StreamingResponse
+from fastapi.responses import JSONResponse, FileResponse, StreamingResponse, Response
 from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
 
@@ -12,12 +12,30 @@ from pdf_generator import generate_icg_report
 app = FastAPI(title="Foldcraft - Marine Protection Gang")
 
 def format_spill(inc: Incident):
-    geom = mapping(to_shape(inc.spatial_data.geometry))
-    track = mapping(to_shape(inc.spatial_data.ship_track))
+    geom = mapping(to_shape(inc.spatial_data.geometry)) if inc.spatial_data and inc.spatial_data.geometry else None
+    track = mapping(to_shape(inc.spatial_data.ship_track)) if inc.spatial_data and inc.spatial_data.ship_track else None
+    sec_track = mapping(to_shape(inc.spatial_data.secondary_ship_track)) if inc.spatial_data and inc.spatial_data.secondary_ship_track else None
     
+    sec_vessel = None
+    if inc.secondary_vessel:
+        sec_vessel = {
+            "name": inc.secondary_vessel.name,
+            "mmsi": inc.secondary_vessel.mmsi,
+            "imo": inc.secondary_vessel.imo,
+            "flag": inc.secondary_vessel.flag,
+            "type": inc.secondary_vessel.vessel_type,
+            "length_m": inc.secondary_vessel.length_m,
+            "is_dark": getattr(inc.secondary_vessel, "is_dark", False)
+        }
+        
+    sec_pos = None
+    if inc.spatial_data and inc.spatial_data.secondary_ship_pos_lon is not None and inc.spatial_data.secondary_ship_pos_lat is not None:
+        sec_pos = [inc.spatial_data.secondary_ship_pos_lon, inc.spatial_data.secondary_ship_pos_lat]
+
     return {
         "id": inc.id,
         "name": inc.name,
+        "spill_type": getattr(inc, "spill_type", "Trailing Wake"),
         "date": inc.date,
         "date_display": inc.date_display,
         "location": inc.location,
@@ -34,12 +52,16 @@ def format_spill(inc: Incident):
             "imo": inc.vessel.imo,
             "flag": inc.vessel.flag,
             "type": inc.vessel.vessel_type,
-            "length_m": inc.vessel.length_m
+            "length_m": inc.vessel.length_m,
+            "is_dark": getattr(inc.vessel, "is_dark", False)
         },
+        "secondary_vessel": sec_vessel,
         "geometry": geom,
         "ship_track": track,
-        "ship_position": [inc.spatial_data.ship_pos_lon, inc.spatial_data.ship_pos_lat],
-        "center": [inc.spatial_data.center_lon, inc.spatial_data.center_lat]
+        "secondary_ship_track": sec_track,
+        "ship_position": [inc.spatial_data.ship_pos_lon, inc.spatial_data.ship_pos_lat] if inc.spatial_data else None,
+        "secondary_ship_position": sec_pos,
+        "center": [inc.spatial_data.center_lon, inc.spatial_data.center_lat] if inc.spatial_data else None
     }
 
 @app.get("/api/spills")
@@ -97,19 +119,32 @@ def get_trajectory(spill_id: int):
 
 @app.get("/api/spills/{spill_id}/report")
 def get_report(spill_id: int):
-    db = SessionLocal()
-    inc = db.query(Incident).filter(Incident.id == spill_id).first()
-    db.close()
-    if not inc:
-        raise HTTPException(status_code=404, detail="Spill incident not found")
-    
-    pdf_buffer = generate_icg_report(format_spill(inc))
-    filename = f"ICG_Dossier_INC_{inc.id:03d}.pdf"
-    return StreamingResponse(
-        pdf_buffer,
-        media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename={filename}"}
-    )
+    try:
+        db = SessionLocal()
+        inc = db.query(Incident).filter(Incident.id == spill_id).first()
+        if not inc:
+            db.close()
+            raise HTTPException(status_code=404, detail="Spill incident not found")
+        spill_dict = format_spill(inc)
+        db.close()
+        
+        pdf_buffer = generate_icg_report(spill_dict)
+        pdf_bytes = pdf_buffer.getvalue()
+        filename = f"ICG_Dossier_INC_{inc.id:03d}.pdf"
+        return Response(
+            content=pdf_bytes,
+            media_type="application/pdf",
+            headers={
+                "Content-Disposition": f'attachment; filename="{filename}"',
+                "Content-Length": str(len(pdf_bytes))
+            }
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Report generation error: {str(e)}")
 
 @app.get("/")
 def get_landing():

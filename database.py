@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, Boolean
 from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 from geoalchemy2 import Geometry
 
@@ -17,15 +17,16 @@ class Vessel(Base):
     flag = Column(String)
     vessel_type = Column(String)
     length_m = Column(Integer)
-    
-    incidents = relationship("Incident", back_populates="vessel")
+    is_dark = Column(Boolean, default=False)
 
 class Incident(Base):
     __tablename__ = "incidents"
     id = Column(Integer, primary_key=True, index=True)
     vessel_id = Column(Integer, ForeignKey("vessels.id"))
+    secondary_vessel_id = Column(Integer, ForeignKey("vessels.id"), nullable=True)
     
     name = Column(String, nullable=False)
+    spill_type = Column(String, default="Trailing Wake") # Trailing Wake, Wind-Drift Pool, Anchorage Pool
     date = Column(String, nullable=False)
     date_display = Column(String, nullable=False)
     location = Column(String, nullable=False)
@@ -37,7 +38,8 @@ class Incident(Base):
     orbit_pass = Column(String, nullable=False)
     confidence = Column(Integer, nullable=False)
     
-    vessel = relationship("Vessel", back_populates="incidents")
+    vessel = relationship("Vessel", foreign_keys=[vessel_id])
+    secondary_vessel = relationship("Vessel", foreign_keys=[secondary_vessel_id])
     spatial_data = relationship("SpatialData", back_populates="incident", uselist=False, cascade="all, delete-orphan")
 
 class SpatialData(Base):
@@ -46,11 +48,14 @@ class SpatialData(Base):
     incident_id = Column(Integer, ForeignKey("incidents.id"))
     
     geometry = Column(Geometry("POLYGON", srid=4326))
-    ship_track = Column(Geometry("LINESTRING", srid=4326))
+    ship_track = Column(Geometry("LINESTRING", srid=4326), nullable=True)
+    secondary_ship_track = Column(Geometry("LINESTRING", srid=4326), nullable=True)
     center_lon = Column(Float)
     center_lat = Column(Float)
     ship_pos_lon = Column(Float)
     ship_pos_lat = Column(Float)
+    secondary_ship_pos_lon = Column(Float, nullable=True)
+    secondary_ship_pos_lat = Column(Float, nullable=True)
 
     incident = relationship("Incident", back_populates="spatial_data")
 

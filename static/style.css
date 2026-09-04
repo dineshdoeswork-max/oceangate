@@ -1,4 +1,4 @@
-﻿*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
   --bg:        #030303;
@@ -118,6 +118,9 @@ body {
 }
 .spill-tag.conf { background: rgba(16,185,129,0.1); color: var(--green); }
 .spill-tag.area { background: rgba(244,63,94,0.1); color: var(--red); }
+.spill-tag.dark { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+.spill-tag.multi { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+.spill-tag.pool { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
 
 .sidebar-footer {
   padding: 12px 18px; font-size: 10px; color: var(--text-dim);
@@ -199,6 +202,33 @@ body {
 .vessel-grid > div { display: flex; flex-direction: column; gap: 2px; }
 .vl { font-size: 10px; color: var(--text-dim); text-transform: uppercase; }
 .vv { font-size: 13px; color: #ffffff; font-weight: 500; }
+
+.dark-alert {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #fca5a5;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 11px;
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.dark-alert i { font-size: 14px; color: #ef4444; }
+
+.sec-vessel-box {
+  background: rgba(168, 85, 247, 0.05);
+  border: 1px dashed rgba(168, 85, 247, 0.4);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-top: 12px;
+}
+.sec-vessel-title {
+  font-size: 11px; color: #c084fc; font-weight: 600;
+  text-transform: uppercase; margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
 
 /* ── LEGEND ── */
 .legend {
