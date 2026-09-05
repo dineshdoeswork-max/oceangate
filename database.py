@@ -37,6 +37,8 @@ class Incident(Base):
     satellite = Column(String, nullable=False)
     orbit_pass = Column(String, nullable=False)
     confidence = Column(Integer, nullable=False)
+    category = Column(String, nullable=True) # Normal Vessel, Dark Vessel, Low Confidence
+    comment = Column(String, nullable=True)
     
     vessel = relationship("Vessel", foreign_keys=[vessel_id])
     secondary_vessel = relationship("Vessel", foreign_keys=[secondary_vessel_id])

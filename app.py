@@ -47,6 +47,8 @@ def format_spill(inc: Incident):
         "satellite": inc.satellite,
         "orbit_pass": inc.orbit_pass,
         "confidence": inc.confidence,
+        "category": getattr(inc, "category", "Normal Vessel"),
+        "comment": getattr(inc, "comment", None),
         "vessel": {
             "name": inc.vessel.name,
             "mmsi": inc.vessel.mmsi,

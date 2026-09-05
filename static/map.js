@@ -145,6 +145,9 @@ function renderCard(spill) {
   if (hasSecondary) {
     extraBadges += `<span class="spill-tag multi"><i class="fa-solid fa-users"></i> 2 SHIPS</span>`;
   }
+  if (spill.category === "Low Confidence" || spill.confidence < 50) {
+    extraBadges += `<span class="spill-tag" style="background:rgba(234,179,8,0.15); color:#eab308; border:1px solid rgba(234,179,8,0.3);"><i class="fa-solid fa-triangle-exclamation"></i> LOW CONF</span>`;
+  }
   if (spill.spill_type) {
     extraBadges += `<span class="spill-tag pool"><i class="fa-solid fa-layer-group"></i> ${spill.spill_type}</span>`;
   }
@@ -246,7 +249,23 @@ function openDetail(spill) {
           <div>
             <strong>UNIDENTIFIED "DARK VESSEL" DETECTED:</strong><br/>
             AIS transponder intentionally unbroadcasted. Target localized via Sentinel-1 SAR metallic radar echo.
+            ${spill.comment ? `<br/><span style="color:#fecaca; font-size:10px;">${spill.comment}</span>` : ''}
           </div>
+        </div>`;
+    } else if (spill.category === "Low Confidence" || spill.confidence < 50) {
+      alertWrap.innerHTML = `
+        <div style="background:rgba(234,179,8,0.12); border:1px solid rgba(234,179,8,0.35); color:#fef08a; padding:10px 14px; border-radius:6px; font-size:11px; margin-top:12px; display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size:14px; color:#eab308;"></i>
+          <div>
+            <strong>LOW CONFIDENCE ATTRIBUTION:</strong><br/>
+            ${spill.comment || "Weak link between slick footprint and candidate vessel AIS trajectory."}
+          </div>
+        </div>`;
+    } else if (spill.comment) {
+      alertWrap.innerHTML = `
+        <div style="background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); color:#bfdbfe; padding:8px 12px; border-radius:6px; font-size:11px; margin-top:12px; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-circle-info" style="color:#60a5fa;"></i>
+          <span><b>Note:</b> ${spill.comment}</span>
         </div>`;
     } else {
       alertWrap.innerHTML = "";
