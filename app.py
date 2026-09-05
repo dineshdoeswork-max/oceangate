@@ -9,7 +9,7 @@ from database import SessionLocal, Vessel, Incident, SpatialData
 from drift_engine import simulate_drift
 from pdf_generator import generate_icg_report
 
-app = FastAPI(title="Foldcraft - Marine Protection Gang")
+app = FastAPI(title="Ocean Intel - Marine Protection Gang")
 
 def format_spill(inc: Incident):
     geom = mapping(to_shape(inc.spatial_data.geometry)) if inc.spatial_data and inc.spatial_data.geometry else None

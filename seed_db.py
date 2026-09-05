@@ -290,7 +290,7 @@ for idx, item in enumerate(LOCATIONS, start=1):
     if spill_type == "Trailing Wake":
         track, poly, ship_lon, ship_lat = make_trailing_wake(lon, lat, heading, length_km)
     elif spill_type == "Wind-Drift Pool":
-        track, poly, ship_lon, ship_lat = make_wind_drift_pool(lon, lat, heading, length_km)
+        track, poly, ship_lon, ship_lat = make_trailing_wake(lon, lat, heading, length_km)
     else: # Anchorage Pool
         track, poly, ship_lon, ship_lat = make_anchorage_pool(lon, lat, heading)
     
