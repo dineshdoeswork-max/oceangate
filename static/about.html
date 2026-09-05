@@ -1,0 +1,203 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Ocean Intel | Marine Ecological Protection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { geist: ['Geist', 'sans-serif'] },
+        },
+      },
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #030303;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  </style>
+</head>
+<body class="relative min-h-screen w-full bg-[#030303] font-geist text-zinc-300 antialiased selection:bg-emerald-500/20 selection:text-emerald-400">
+
+  <!-- Radial Background Accent -->
+  <div class="pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(16,185,129,0.12),rgba(3,3,3,0.95))]"></div>
+
+  <!-- Header -->
+  <header class="relative z-30 flex items-center justify-between border-b border-white/10 px-6 py-5 sm:px-12 backdrop-blur-md bg-black/40 sticky top-0">
+    <div class="flex items-center gap-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 backdrop-blur-md">
+        <i data-lucide="waves" class="w-5 h-5 text-emerald-400"></i>
+      </div>
+      <a href="/" class="text-lg font-semibold tracking-wider text-white">
+        OCEAN INTEL <span class="text-xs font-normal text-zinc-500">/ ABOUT</span>
+      </a>
+    </div>
+
+    <nav class="flex items-center gap-4">
+      <a href="/" class="text-sm text-zinc-400 transition hover:text-white">Home</a>
+      <a
+        href="/map"
+        class="flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-5 py-2 text-sm font-medium text-emerald-400 backdrop-blur-md transition hover:bg-emerald-500 hover:text-black"
+      >
+        <i data-lucide="compass" class="w-4 h-4"></i>
+        <span>Live Radar Map</span>
+      </a>
+    </nav>
+  </header>
+
+  <main class="relative z-20 mx-auto max-w-5xl px-6 py-12 sm:px-12 sm:py-20">
+
+    <!-- Hero Title -->
+    <div class="mb-16">
+      <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3.5 py-1 text-xs font-medium text-emerald-400 backdrop-blur-md mb-4">
+        <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+        <span>Ecological Threat Assessment & Autonomous Defense</span>
+      </div>
+      <h1 class="text-4xl font-light tracking-tight text-white sm:text-5xl md:text-6xl">
+        The Invisible Catastrophe <br />
+        <span class="font-normal text-emerald-400">In Our Oceans.</span>
+      </h1>
+      <p class="mt-6 max-w-2xl text-base font-normal leading-relaxed text-zinc-400 sm:text-lg">
+        Over 80% of marine oil contamination doesn't come from dramatic tanker disasters—it stems from deliberate, illegal bilge discharges and dark vessel operations. Here is why it devastates the planet and how Ocean Intel fights back.
+      </p>
+    </div>
+
+    <!-- Section 1: Ecological Impact -->
+    <section class="mb-20">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="h-8 w-1 rounded-full bg-rose-500"></div>
+        <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          How Oil Spills Devastate Marine Life & Coastal Habitats
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Card 1 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md transition hover:border-rose-500/40 hover:bg-white/[0.04]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-rose-500/10 text-rose-400 mb-5">
+            <i data-lucide="feather" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-medium text-white mb-2">Hypothermia & Suffocation</h3>
+          <p class="text-sm leading-relaxed text-zinc-400">
+            Oil destroys the natural waterproofing and insulation of seabird feathers and sea otter fur. Animals freeze to death in cold currents or ingest toxic hydrocarbons while frantically preening.
+          </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md transition hover:border-rose-500/40 hover:bg-white/[0.04]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 mb-5">
+            <i data-lucide="skull" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-medium text-white mb-2">Food Chain Toxicity</h3>
+          <p class="text-sm leading-relaxed text-zinc-400">
+            Microscopic oil droplets are consumed by zooplankton and coral polyps. Carcinogenic Polycyclic Aromatic Hydrocarbons (PAHs) bioaccumulate up the trophic chain into commercial fisheries, dolphins, and humans.
+          </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md transition hover:border-rose-500/40 hover:bg-white/[0.04]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-orange-500/10 text-orange-400 mb-5">
+            <i data-lucide="trees" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-lg font-medium text-white mb-2">Mangrove & Wetland Smothering</h3>
+          <p class="text-sm leading-relaxed text-zinc-400">
+            When slicks reach intertidal coastlines, thick crude coats mangrove aerial roots (pneumatophores), cutting off oxygen exchange and suffocating vital breeding nurseries for 30+ years.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Prevention & Technological Defense -->
+    <section class="mb-20">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="h-8 w-1 rounded-full bg-emerald-500"></div>
+        <h2 class="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          How Ocean Intel Prevents and Counters Ocean Discharges
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Feature 1 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md">
+          <div class="flex items-center gap-3 mb-3">
+            <i data-lucide="satellite" class="w-5 h-5 text-emerald-400"></i>
+            <h3 class="text-base font-semibold text-white">Synthetic Aperture Radar (SAR)</h3>
+          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            ESA Sentinel-1 radar pulses penetrate cloud cover and darkness. Because oil dampens high-frequency capillary ripples on the sea surface, radar echoes show slicks as distinctive dark contrast regions regardless of weather.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md">
+          <div class="flex items-center gap-3 mb-3">
+            <i data-lucide="ghost" class="w-5 h-5 text-purple-400"></i>
+            <h3 class="text-base font-semibold text-white">Dark Vessel Identification</h3>
+          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            Vessels deliberately turning off AIS transponders to dump oily bilge water are localized through metallic radar backscatter coincidences with slick origin points, stripping away impunity.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md">
+          <div class="flex items-center gap-3 mb-3">
+            <i data-lucide="wind" class="w-5 h-5 text-amber-400"></i>
+            <h3 class="text-base font-semibold text-white">Copernicus + OpenDrift Forecasts</h3>
+          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            Lagrangian particle simulations powered by real-time Copernicus Marine current vectors predict slick trajectory and shoreline threat vectors 24 to 48 hours in advance, allowing containment booms to deploy early.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-md">
+          <div class="flex items-center gap-3 mb-3">
+            <i data-lucide="file-check" class="w-5 h-5 text-blue-400"></i>
+            <h3 class="text-base font-semibold text-white">Automated Coast Guard Briefs (ICG)</h3>
+          </div>
+          <p class="text-sm text-zinc-400 leading-relaxed">
+            Generates standardized forensic enforcement dossiers complete with vessel IMO/MMSI, flag registries, slick morphology, and maritime jurisdiction bounds ready for legal prosecution under MARPOL Annex I.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Call to action -->
+    <div class="rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.05] p-8 sm:p-12 text-center backdrop-blur-md">
+      <h3 class="text-2xl sm:text-3xl font-light text-white mb-3">
+        Monitor Active Detections Worldwide
+      </h3>
+      <p class="text-zinc-400 max-w-xl mx-auto mb-6 text-sm sm:text-base">
+        Inspect real-time Sentinel-1 detections, view dark ship tracks, and run interactive OpenDrift trajectory models.
+      </p>
+      <a
+        href="/map"
+        class="inline-flex items-center gap-2 rounded-lg bg-emerald-500 px-6 py-3 text-sm font-semibold text-black transition hover:bg-emerald-400 hover:scale-105"
+      >
+        <i data-lucide="compass" class="w-4 h-4"></i>
+        <span>Launch Ocean Radar Map</span>
+      </a>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-white/10 py-8 text-center text-xs text-zinc-500 relative z-20">
+    ESA Copernicus &bull; MARPOL Annex I Monitoring &bull; Ocean Intel &bull; Marine Protection Gang
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

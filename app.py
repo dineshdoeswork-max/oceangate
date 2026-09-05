@@ -1,4 +1,5 @@
 import os
+import concurrent.futures
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse, StreamingResponse, Response
@@ -6,7 +7,7 @@ from geoalchemy2.shape import to_shape
 from shapely.geometry import mapping
 
 from database import SessionLocal, Vessel, Incident, SpatialData
-from drift_engine import simulate_drift
+from drift_engine import simulate_drift, get_current_metocean
 from pdf_generator import generate_icg_report
 
 app = FastAPI(title="Ocean Intel - Marine Protection Gang")
@@ -87,23 +88,27 @@ def get_spill(spill_id: int):
 def get_stats():
     db = SessionLocal()
     incidents = db.query(Incident).all()
-    db.close()
     if not incidents:
-        return {"total_spills": 0, "total_area_km2": 0, "total_length_km": 0, "avg_confidence": 0}
+        db.close()
+        return {"total_spills": 0, "total_area_km2": 0, "dark_vessels": 0, "avg_confidence": 0}
     
     total_area = sum(i.area_km2 for i in incidents)
     avg_conf = sum(i.confidence for i in incidents) / len(incidents)
+    dark_count = sum(1 for i in incidents if i.vessel and getattr(i.vessel, "is_dark", False))
+    satellites = list(set(i.satellite for i in incidents))
+    eezs = [i.eez for i in incidents]
+    db.close()
     return {
         "total_spills": len(incidents),
         "total_area_km2": round(total_area, 1),
-        "total_length_km": round(sum(i.length_km for i in incidents), 1),
+        "dark_vessels": dark_count,
         "avg_confidence": round(avg_conf, 1),
-        "satellites_used": list(set(i.satellite for i in incidents)),
-        "eezs_affected": [i.eez for i in incidents]
+        "satellites_used": satellites,
+        "eezs_affected": eezs
     }
 
 @app.get("/api/spills/{spill_id}/trajectory")
-def get_trajectory(spill_id: int):
+def get_trajectory(spill_id: int, mode: str = "forecast"):
     db = SessionLocal()
     inc = db.query(Incident).filter(Incident.id == spill_id).first()
     if not inc:
@@ -114,8 +119,23 @@ def get_trajectory(spill_id: int):
     db.close()
     
     coords = geom["coordinates"][0]
-    forecasts = simulate_drift(coords, hours=[12, 24, 48])
-    return {"spill_id": spill_id, "forecasts": forecasts}
+    forecasts = simulate_drift(coords, hours=[24, 48], mode=mode)
+    return {"spill_id": spill_id, "mode": mode, "forecasts": forecasts}
+
+@app.get("/api/spills/{spill_id}/metocean")
+def get_metocean(spill_id: int):
+    db = SessionLocal()
+    inc = db.query(Incident).filter(Incident.id == spill_id).first()
+    if not inc or not inc.spatial_data:
+        db.close()
+        raise HTTPException(status_code=404, detail="Spill incident or location not found")
+    
+    lat = inc.spatial_data.center_lat or 19.0
+    lon = inc.spatial_data.center_lon or 72.8
+    db.close()
+    
+    data = get_current_metocean(lat, lon)
+    return {"spill_id": spill_id, "location": inc.location, "coordinates": [lon, lat], **data}
 
 @app.get("/api/spills/{spill_id}/report")
 def get_report(spill_id: int):
@@ -153,6 +173,10 @@ def get_landing():
 @app.get("/map")
 def get_map():
     return FileResponse(os.path.join("static", "map.html"))
+
+@app.get("/about")
+def get_about():
+    return FileResponse(os.path.join("static", "about.html"))
 
 app.mount("/", StaticFiles(directory="static"), name="static")
 

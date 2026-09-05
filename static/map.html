@@ -21,7 +21,10 @@
         <div class="logo-sub">Marine Protection Gang</div>
       </div>
     </a>
-    <div class="live-badge"><span class="pulse-dot"></span> LIVE</div>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <a href="/about" style="color: var(--text-dim); text-decoration: none; font-size: 11px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 4px; transition: all 0.2s;" onmouseover="this.style.color='#fff'; this.style.borderColor='#52525b'" onmouseout="this.style.color='var(--text-dim)'; this.style.borderColor='var(--border)'"><i class="fa-solid fa-circle-info"></i> About</a>
+      <div class="live-badge"><span class="pulse-dot"></span> LIVE</div>
+    </div>
   </div>
 
   <div class="stats-grid" id="stats-grid">
@@ -38,8 +41,8 @@
       <div class="stat-label">Avg Conf</div>
     </div>
     <div class="stat-card">
-      <div class="stat-value" id="stat-length">--</div>
-      <div class="stat-label">Total km</div>
+      <div class="stat-value" id="stat-dark" style="color: #ef4444;">--</div>
+      <div class="stat-label">Dark Ships</div>
     </div>
   </div>
 
@@ -61,6 +64,9 @@
   <div id="map"></div>
 
   <div class="detail-panel" id="detail-panel">
+    <div class="panel-resizer" id="panel-resizer">
+      <div class="resizer-bar"></div>
+    </div>
     <div class="detail-header">
       <div>
         <div class="detail-name" id="d-name"></div>
@@ -93,6 +99,14 @@
         <div class="detail-label"><i class="fa-solid fa-circle-check"></i> Status</div>
         <div class="detail-val" id="d-status"></div>
       </div>
+      <div class="detail-block">
+        <div class="detail-label"><i class="fa-solid fa-water"></i> Ocean Current</div>
+        <div class="detail-val" id="d-current"><span style="color:#71717a; font-size:11px;">Loading live...</span></div>
+      </div>
+      <div class="detail-block">
+        <div class="detail-label"><i class="fa-solid fa-wind"></i> Surface Wind</div>
+        <div class="detail-val" id="d-wind"><span style="color:#71717a; font-size:11px;">Loading live...</span></div>
+      </div>
     </div>
 
     <div id="dark-alert-wrap"></div>
@@ -112,7 +126,7 @@
 
       <div style="margin-top: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); padding-top: 12px;">
         <button id="btn-drift" class="status-badge investigating" style="cursor:pointer; border:none; padding: 6px 12px;">
-          <i class="fa-solid fa-wind"></i> 48h Drift Forecast
+          <i class="fa-solid fa-wind"></i> 24 & 48h Drift Forecast
         </button>
         <button id="btn-report" class="status-badge confirmed" style="cursor:pointer; border:none; padding: 6px 12px;">
           <i class="fa-solid fa-file-pdf"></i> Download ICG Brief

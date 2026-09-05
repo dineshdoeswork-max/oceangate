@@ -59,5 +59,8 @@ class SpatialData(Base):
 
     incident = relationship("Incident", back_populates="spatial_data")
 
-# Create tables if they don't exist (do NOT drop on every import)
-Base.metadata.create_all(bind=engine)
+# Create tables if they don't exist
+try:
+    Base.metadata.create_all(bind=engine, checkfirst=True)
+except Exception:
+    pass

@@ -348,7 +348,7 @@ for idx, item in enumerate(LOCATIONS, start=1):
         status=random.choice(["Confirmed", "Under Investigation"]),
         satellite=random.choice(["Sentinel-1A", "Sentinel-1B"]),
         orbit_pass=f"Pass #{random.randint(10000, 99999)}",
-        confidence=random.randint(84, 98)
+        confidence=random.randint(91, 98)
     )
     db.add(incident)
     db.flush()
